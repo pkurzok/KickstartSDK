@@ -9,7 +9,7 @@ import CoreGraphics
 import Foundation
 
 /// Contains the display-ready content and URLs for an advertisement.
-struct ExchangeAdPresentation: Sendable {
+struct ExchangeAdPresentation {
     let serveID: String?
     let impressionToken: String?
     let ad: ExchangeServedAdResponse

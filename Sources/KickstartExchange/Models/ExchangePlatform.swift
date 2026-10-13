@@ -16,7 +16,7 @@ import UIKit
 /// Kickstart Exchange matches adverts against the platform making the request,
 /// so an advert is only ever shown where its app can actually be installed.
 /// This describes the kind of device, never a specific one.
-enum ExchangePlatform: String, Hashable, Sendable {
+enum ExchangePlatform: String, Hashable {
     case iOS = "ios"
     case iPadOS = "ipados"
     case macOS = "macos"

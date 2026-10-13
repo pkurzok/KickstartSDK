@@ -6,6 +6,6 @@
 //
 
 /// Carries the server's reason when session creation is rejected.
-struct ExchangeSessionRejection: Error, Sendable {
+struct ExchangeSessionRejection: Error {
     let reason: String?
 }

@@ -6,7 +6,7 @@
 //
 
 /// Contains the token and accounting status granted for an Exchange session.
-struct ExchangeSessionResponse: Sendable {
+struct ExchangeSessionResponse {
     let sessionToken: String
     let countsEnabled: Bool
     let countingReason: String?

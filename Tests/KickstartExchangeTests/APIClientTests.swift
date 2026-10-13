@@ -67,6 +67,7 @@ struct APIClientTests {
         #expect(body["platform"] as? String == "macos")
         #expect(body["app_version"] as? String == TestFixtures.appVersion)
         #expect(body["build_version"] as? String == TestFixtures.buildVersion)
+        #expect(body["sdk_version"] as? String == kickstartSDKVersion)
         #expect(body["development"] as? Bool == true)
     }
 
@@ -106,6 +107,7 @@ struct APIClientTests {
             "build_version", "sdk_version", "app_transaction"
         ])
         #expect(body["app_transaction"] as? String == evidence)
+        #expect(body["sdk_version"] as? String == kickstartSDKVersion)
         #expect(body.keys.contains("development") == false)
         #expect(body.keys.contains("storefront") == false)
         #expect(body.keys.contains("locale") == false)

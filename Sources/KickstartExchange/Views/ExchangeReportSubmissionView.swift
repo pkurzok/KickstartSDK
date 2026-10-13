@@ -12,8 +12,8 @@ import SwiftUI
 struct ExchangeReportSubmissionView: View {
     let reason: ExchangeReportReason
     let isPreview: Bool
-    let submit: @MainActor @Sendable (ExchangeReportReason) async -> Bool
-    let close: @MainActor @Sendable () -> Void
+    let submit: @MainActor (ExchangeReportReason) async -> Bool
+    let close: @MainActor () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var state = SubmissionState.submitting

@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "base_url": "https://api.kickstart.tools",
+  "operations": {
+    "session": {
+      "method": "POST",
+      "path": "/signal/v1/sessions",
+      "request": {
+        "app_transaction": "signed-app-transaction-fixture",
+        "bundle_id": "com.example.signal",
+        "sdk_version": "contract-test"
+      },
+      "success": {
+        "status": 200,
+        "response": {
+          "session_token": "kss_sssssssssssssssssssssssssssssssssssssssssss",
+          "expires_in": 900
+        }
+      }
+    },
+    "config": {
+      "method": "GET",
+      "path": "/signal/v1/config",
+      "request": null,
+      "success": {
+        "status": 200,
+        "response": {
+          "interactions_enabled": true,
+          "limits": {
+            "title": 80,
+            "description": 500,
+            "comment": 500
+          }
+        }
+      }
+    },
+    "list_requests": {
+      "method": "GET",
+      "path": "/signal/v1/requests",
+      "request": null,
+      "success": {
+        "status": 200,
+        "response": {
+          "requests": [
+            {
+              "id": "ksreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "creation_order": 1,
+              "title": "Add folders",
+              "description": "Organize saved items into folders.",
+              "status": "planned",
+              "vote_count": 3,
+              "comment_count": 1,
+              "is_developer": false,
+              "created_at": "2026-09-18T12:00:00Z",
+              "updated_at": "2026-09-18T12:00:00Z"
+            }
+          ],
+          "next_cursor": null
+        }
+      }
+    },
+    "request": {
+      "method": "GET",
+      "path": "/signal/v1/requests/{request_id}",
+      "request": null,
+      "success": {
+        "status": 200,
+        "response": {
+          "id": "ksreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "creation_order": 1,
+          "title": "Add folders",
+          "description": "Organize saved items into folders.",
+          "status": "planned",
+          "vote_count": 3,
+          "comment_count": 1,
+          "is_developer": false,
+          "created_at": "2026-09-18T12:00:00Z",
+          "updated_at": "2026-09-18T12:00:00Z"
+        }
+      }
+    },
+    "create_request": {
+      "method": "POST",
+      "path": "/signal/v1/requests",
+      "request": {
+        "anonymous_id": "a8d88882-3c4f-4394-92c9-1fb56d22ef00",
+        "title": "Add folders",
+        "description": "Organize saved items into folders."
+      },
+      "success": {
+        "status": 201,
+        "response": {
+          "id": "ksreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "moderation_state": "unpublished",
+          "has_voted": true
+        }
+      }
+    },
+    "vote": {
+      "method": "POST",
+      "path": "/signal/v1/requests/{request_id}/votes",
+      "request": {
+        "anonymous_id": "a8d88882-3c4f-4394-92c9-1fb56d22ef00",
+        "is_premium": true
+      },
+      "success": {
+        "status": 200,
+        "response": {
+          "id": "ksreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "creation_order": 1,
+          "title": "Add folders",
+          "description": "Organize saved items into folders.",
+          "status": "planned",
+          "vote_count": 4,
+          "comment_count": 1,
+          "is_developer": false,
+          "created_at": "2026-09-18T12:00:00Z",
+          "updated_at": "2026-09-18T12:00:00Z"
+        }
+      }
+    },
+    "remove_vote": {
+      "method": "DELETE",
+      "path": "/signal/v1/requests/{request_id}/votes",
+      "request": {
+        "anonymous_id": "a8d88882-3c4f-4394-92c9-1fb56d22ef00"
+      },
+      "success": {
+        "status": 200,
+        "response": {
+          "id": "ksreq_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "creation_order": 1,
+          "title": "Add folders",
+          "description": "Organize saved items into folders.",
+          "status": "planned",
+          "vote_count": 3,
+          "comment_count": 1,
+          "is_developer": false,
+          "created_at": "2026-09-18T12:00:00Z",
+          "updated_at": "2026-09-18T12:00:00Z"
+        }
+      }
+    },
+    "list_comments": {
+      "method": "GET",
+      "path": "/signal/v1/requests/{request_id}/comments",
+      "request": null,
+      "success": {
+        "status": 200,
+        "response": {
+          "comments": [
+            {
+              "id": "kscom_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "body": "Folders would help organize my work.",
+              "is_developer": false,
+              "created_at": "2026-09-18T12:00:00Z"
+            }
+          ],
+          "next_cursor": null
+        }
+      }
+    },
+    "create_comment": {
+      "method": "POST",
+      "path": "/signal/v1/requests/{request_id}/comments",
+      "request": {
+        "anonymous_id": "a8d88882-3c4f-4394-92c9-1fb56d22ef00",
+        "body": "Folders would help organize my work.",
+        "is_premium": true
+      },
+      "success": {
+        "status": 201,
+        "response": {
+          "id": "kscom_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "moderation_state": "unpublished"
+        }
+      }
+    }
+  }
+}

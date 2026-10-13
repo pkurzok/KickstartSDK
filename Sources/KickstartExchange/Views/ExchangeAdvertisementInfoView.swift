@@ -21,7 +21,7 @@ import SwiftUI
 struct ExchangeAdvertisementInfoView: View {
     let presentation: ExchangeAdPresentation
     let isPreview: Bool
-    let submitReport: @MainActor @Sendable (ExchangeReportReason) async -> Bool
+    let submitReport: @MainActor (ExchangeReportReason) async -> Bool
 
     @Environment(\.dismiss) private var dismiss
 

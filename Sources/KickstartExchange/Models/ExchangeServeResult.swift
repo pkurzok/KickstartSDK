@@ -6,7 +6,7 @@
 //
 
 /// Represents either a received advertisement or the server's rejection reason.
-enum ExchangeServeResult: Sendable {
+enum ExchangeServeResult {
     case advertisement(ExchangeServeResponse)
     case rejected(reason: String?)
 }

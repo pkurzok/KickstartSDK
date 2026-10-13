@@ -18,13 +18,13 @@ struct EventDeliveryDiagnosticsTests {
     func developmentFailureReports() async throws {
         let handler = readyHandler(impression: .failure(URLError(.timedOut)))
         let recorder = DiagnosticRecorder()
-        let model = makeModel(handler: handler, recorder: recorder)
+        let appRunStore = ExchangeAdRunStore()
+        let model = makeModel(handler: handler, recorder: recorder, appRunStore: appRunStore)
         await model.load()
 
         _ = try #require(await model.recordClick())
-        #expect(await AsyncTestWaiter.until {
-            recorder.messages.isEmpty == false
-        })
+        try await waitForImpression(in: appRunStore)
+        #expect(await handler.requests().count { $0.url == ExchangeEndpoint.impressions } == 3)
         #expect(recorder.messages == [Self.impressionDiagnostic])
     }
 
@@ -35,18 +35,18 @@ struct EventDeliveryDiagnosticsTests {
             impression: .success(TestFixtures.response(data: Data(), statusCode: 503))
         )
         let recorder = DiagnosticRecorder()
+        let appRunStore = ExchangeAdRunStore()
         let model = makeModel(
             handler: handler,
             recorder: recorder,
+            appRunStore: appRunStore,
             isDevelopment: false
         )
         await model.load()
 
         _ = try #require(await model.recordClick())
-        #expect(await AsyncTestWaiter.until {
-            await handler.requests().count == 5
-        })
-        await Task.yield()
+        try await waitForImpression(in: appRunStore, isDevelopment: false)
+        #expect(await handler.requests().count { $0.url == ExchangeEndpoint.impressions } == 3)
         #expect(recorder.messages.isEmpty)
     }
 
@@ -55,15 +55,31 @@ struct EventDeliveryDiagnosticsTests {
     func cancellationStaysQuiet() async throws {
         let handler = readyHandler(impression: .failure(URLError(.cancelled)))
         let recorder = DiagnosticRecorder()
-        let model = makeModel(handler: handler, recorder: recorder)
+        let appRunStore = ExchangeAdRunStore()
+        let model = makeModel(handler: handler, recorder: recorder, appRunStore: appRunStore)
         await model.load()
 
         _ = try #require(await model.recordClick())
-        #expect(await AsyncTestWaiter.until {
-            await handler.requests().count == 5
-        })
-        await Task.yield()
+        try await waitForImpression(in: appRunStore)
+        #expect(await handler.requests().count { $0.url == ExchangeEndpoint.impressions } == 1)
         #expect(recorder.messages.isEmpty)
+    }
+
+    @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+    private func waitForImpression(in appRunStore: ExchangeAdRunStore, isDevelopment: Bool = true) async throws {
+        let key = ExchangeAdRunKey(
+            apiKey: TestFixtures.apiKey,
+            bundleIdentifier: TestFixtures.bundleIdentifier,
+            platform: .iOS,
+            development: isDevelopment
+        )
+        try #require(appRunStore.hasStartedImpression(for: key))
+
+        // Await the existing delivery task, including all retries and its final diagnostic decision.
+        let task = try #require(appRunStore.beginImpression(for: key) {
+            Issue.record("Expected to reuse the impression task started by the model.")
+        })
+        await task.value
     }
 
     private static let impressionDiagnostic =
@@ -79,7 +95,8 @@ struct EventDeliveryDiagnosticsTests {
             .success(TestFixtures.response(data: TestFixtures.sessionResponse())),
             .success(TestFixtures.response(data: TestFixtures.creativeResponse())),
             .success(TestFixtures.response(data: TestFixtures.validPNG)),
-            .success(TestFixtures.completedClickResponse),
+            impression,
+            impression,
             impression
         ])
     }
@@ -88,6 +105,7 @@ struct EventDeliveryDiagnosticsTests {
     private func makeModel(
         handler: MockRequestHandler,
         recorder: DiagnosticRecorder,
+        appRunStore: ExchangeAdRunStore,
         isDevelopment: Bool = true
     ) -> ExchangeAdViewModel {
         ExchangeAdViewModel(
@@ -96,9 +114,14 @@ struct EventDeliveryDiagnosticsTests {
             appVersion: TestFixtures.appVersion,
             buildVersion: TestFixtures.buildVersion,
             request: { request in
-                try await handler.response(for: request)
+                if request.url?.absoluteString == TestFixtures.clickURL {
+                    return TestFixtures.completedClickResponse
+                }
+                return try await handler.response(for: request)
             },
             isDevelopment: isDevelopment,
+            impressionRetrySleep: { _ in },
+            appRunStore: appRunStore,
             diagnosticHandler: recorder.record
         )
     }

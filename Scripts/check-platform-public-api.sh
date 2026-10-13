@@ -7,11 +7,19 @@
 
 set -euo pipefail
 
+product="${1:-KickstartExchange}"
+case "$product" in
+    KickstartExchange|KickstartSignal) ;;
+    *) echo "Usage: $0 [KickstartExchange|KickstartSignal]" >&2; exit 1 ;;
+esac
+
 package_path="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 sdk_scratch="$(mktemp -d /private/tmp/KickstartSDK-platform-compilation.XXXXXX)"
 external_fixture="$sdk_scratch/PublicAPIFixture.swift"
 source_list="$sdk_scratch/sources"
 test_list="$sdk_scratch/tests"
+shared_list="$sdk_scratch/shared"
+find "$package_path/Sources/KickstartShared" -name '*.swift' > "$shared_list"
 resource_accessor="$sdk_scratch/resource_bundle_accessor.swift"
 toolchain_usr="$(dirname "$(dirname "$(xcrun --toolchain default --find swiftc)")")"
 testing_plugin_root="$toolchain_usr/lib/swift/host/plugins/testing"
@@ -26,9 +34,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-cp "$package_path/Tests/KickstartExchangeTests/PublicAPIFixture.swift" "$external_fixture"
-rg --files "$package_path/Sources/KickstartExchange" -g '*.swift' > "$source_list"
-rg --files "$package_path/Tests/KickstartExchangeTests" -g '*.swift' > "$test_list"
+cp "$package_path/Tests/${product}Tests/PublicAPIFixture.swift" "$external_fixture"
+find "$package_path/Sources/$product" -name '*.swift' > "$source_list"
+find "$package_path/Tests/${product}Tests" -name '*.swift' > "$test_list"
 
 {
     echo 'import Foundation'
@@ -37,18 +45,18 @@ rg --files "$package_path/Tests/KickstartExchangeTests" -g '*.swift' > "$test_li
     echo '}'
 } > "$resource_accessor"
 
-if ! rg -q '^import KickstartExchange$' "$external_fixture"; then
-    echo "PublicAPIFixture.swift must import KickstartExchange directly." >&2
+if ! grep -q "^import ${product}\$" "$external_fixture"; then
+    echo "PublicAPIFixture.swift must import $product directly." >&2
     exit 1
 fi
 
-if rg -q '@testable|@_spi|^package[[:space:]]+import' "$external_fixture"; then
+if grep -Eq '@testable|@_spi|^package[[:space:]]+import' "$external_fixture"; then
     echo "PublicAPIFixture.swift must use only the public SDK API." >&2
     exit 1
 fi
 
 for declaration in '.iOS(.v15)' '.macOS(.v12)' '.tvOS(.v15)' '.watchOS(.v8)' '.visionOS(.v1)'; do
-    if ! rg -Fq "$declaration" "$package_path/Package.swift"; then
+    if ! grep -Fq "$declaration" "$package_path/Package.swift"; then
         echo "Package.swift is missing its required $declaration deployment minimum." >&2
         exit 1
     fi
@@ -89,10 +97,19 @@ check_platform() {
             )
         fi
 
+        xcrun --sdk "$sdk_name" swiftc -emit-library -static -emit-module -parse-as-library \
+            -module-name KickstartShared -package-name KickstartSDK -swift-version 6 -strict-concurrency=complete -warnings-as-errors \
+            "${configuration_arguments[@]}" -target "$target" -sdk "$sdk_path" \
+            -module-cache-path "$module_cache" \
+            -emit-module-path "$modules/KickstartShared.swiftmodule" \
+            -o "$modules/libKickstartShared.a" @"$shared_list"
+
         xcrun --sdk "$sdk_name" swiftc \
-            -emit-module \
+            -emit-library -static -emit-module \
             -parse-as-library \
-            -module-name KickstartExchange \
+            -I "$modules" \
+            -module-name "$product" \
+            -package-name KickstartSDK \
             -swift-version 6 \
             -strict-concurrency=complete \
             -warnings-as-errors \
@@ -103,14 +120,15 @@ check_platform() {
             -module-cache-path "$module_cache" \
             -load-plugin-library "$platform_plugin_root/libObservationMacros.dylib" \
             -load-plugin-library "$platform_plugin_root/libSwiftUIMacros.dylib" \
-            -emit-module-path "$modules/KickstartExchange.swiftmodule" \
+            -emit-module-path "$modules/$product.swiftmodule" \
+            -o "$modules/lib$product.a" \
             @"$source_list" \
             "$resource_accessor"
 
         xcrun --sdk "$sdk_name" swiftc \
             -typecheck \
             -parse-as-library \
-            -module-name KickstartExchangeExternalPublicAPICheck \
+            -module-name "${product}ExternalPublicAPICheck" \
             -swift-version 6 \
             -strict-concurrency=complete \
             -warnings-as-errors \
@@ -124,7 +142,8 @@ check_platform() {
         xcrun --sdk "$sdk_name" swiftc \
             -typecheck \
             -parse-as-library \
-            -module-name KickstartExchangeTests \
+            -module-name "${product}Tests" \
+            -package-name KickstartSDK \
             -swift-version 6 \
             -strict-concurrency=complete \
             -warnings-as-errors \
@@ -136,10 +155,11 @@ check_platform() {
             -I "$modules" \
             -F "$platform_developer/Library/Frameworks" \
             -plugin-path "$testing_plugin_root" \
-            @"$test_list"
+            @"$test_list" \
+            "$resource_accessor"
     done
 
-    echo "Verified $platform_name ($target) by emitting the SDK module and type-checking tests and an external client in debug and release."
+    echo "Verified $product on $platform_name ($target) by compiling the SDK static library and type-checking tests and an external client in debug and release."
 }
 
 check_platform "iOS and iPadOS" ios iphoneos arm64-apple-ios15.0

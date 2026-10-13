@@ -1,5 +1,12 @@
 // swift-tools-version: 6.2
 
+//
+// Package.swift
+// KickstartSDK
+// https://github.com/twostraws/KickstartSDK
+// See LICENSE for license information.
+//
+
 import PackageDescription
 
 let package = Package(
@@ -14,13 +21,33 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "KickstartSignal",
+            targets: ["KickstartSignal"]
+        ),
+        .library(
             name: "KickstartExchange",
             targets: ["KickstartExchange"]
         )
     ],
     targets: [
+        .target(name: "KickstartShared"),
+        .target(
+            name: "KickstartSignal",
+            dependencies: ["KickstartShared"],
+            resources: [
+                .process("Resources")
+            ]
+        ),
+        .testTarget(
+            name: "KickstartSignalTests",
+            dependencies: ["KickstartSignal"],
+            resources: [
+                .process("Fixtures")
+            ]
+        ),
         .target(
             name: "KickstartExchange",
+            dependencies: ["KickstartShared"],
             resources: [
                 .process("Resources")
             ]

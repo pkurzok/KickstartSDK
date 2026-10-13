@@ -6,7 +6,7 @@
 //
 
 /// Describes why an advertisement could not be loaded.
-enum ExchangeLoadFailure: Error, Sendable {
+enum ExchangeLoadFailure: Error {
     case missingAPIKey
     case previewUnavailable
     case missingBundleIdentifier

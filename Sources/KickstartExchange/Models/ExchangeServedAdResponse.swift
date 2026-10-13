@@ -8,7 +8,7 @@
 import Foundation
 
 /// Decodes the advertised app details returned by the Exchange API.
-struct ExchangeServedAdResponse: Decodable, Sendable {
+struct ExchangeServedAdResponse: Decodable {
     let name: String
     let subtitle: String?
     let developerName: String

@@ -6,7 +6,7 @@
 //
 
 /// Encodes the serve identifier and reason for an advertisement report.
-struct ExchangeReportRequest: Encodable, Sendable {
+struct ExchangeReportRequest: Encodable {
     let serveID: String
     let reason: ExchangeReportReason
 

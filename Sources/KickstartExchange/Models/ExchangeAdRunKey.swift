@@ -6,7 +6,7 @@
 //
 
 /// Identifies shared advertisement work for one app, platform, key, and environment.
-struct ExchangeAdRunKey: Hashable, Sendable {
+struct ExchangeAdRunKey: Hashable {
     let apiKey: String
     let bundleIdentifier: String
     let platform: ExchangePlatform

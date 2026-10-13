@@ -6,6 +6,6 @@
 //
 
 /// Encodes storefront context for an advertisement request.
-struct ExchangeServeRequest: Encodable, Sendable {
+struct ExchangeServeRequest: Encodable {
     let storefront: String?
 }

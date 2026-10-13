@@ -6,6 +6,6 @@
 //
 
 /// Identifies failures while recording an advertisement click.
-enum ExchangeClickSubmissionFailure: Error, Sendable {
+enum ExchangeClickSubmissionFailure: Error {
     case unexpectedResponse
 }

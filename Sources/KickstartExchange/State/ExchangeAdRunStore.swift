@@ -33,7 +33,7 @@ final class ExchangeAdRunStore {
 
     func result(
         for key: ExchangeAdRunKey,
-        acquire: @escaping @MainActor @Sendable () async -> ExchangeAdRunResult
+        acquire: @escaping @MainActor () async -> ExchangeAdRunResult
     ) async -> ExchangeAdRunResult {
         if let result = entries[key]?.result {
             return result
@@ -66,7 +66,7 @@ final class ExchangeAdRunStore {
     @discardableResult
     func beginImpression(
         for key: ExchangeAdRunKey,
-        deliver: @escaping @MainActor @Sendable () async -> Void
+        deliver: @escaping @MainActor () async -> Void
     ) -> Task<Void, Never>? {
         guard var entry = entries[key],
               entry.result != nil,

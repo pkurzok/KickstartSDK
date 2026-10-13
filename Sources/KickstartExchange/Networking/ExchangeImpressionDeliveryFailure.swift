@@ -6,7 +6,7 @@
 //
 
 /// Classifies failures while recording an advertisement impression.
-enum ExchangeImpressionDeliveryFailure: Error, Equatable, Sendable {
+enum ExchangeImpressionDeliveryFailure: Error, Equatable {
     case transport
     case server
     case unexpectedResponse

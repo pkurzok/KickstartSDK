@@ -6,7 +6,7 @@
 //
 
 /// Represents the shared advertisement acquisition result for one app run.
-enum ExchangeAdRunResult: Sendable {
+enum ExchangeAdRunResult {
     case unavailable
     case advertisement(ExchangeAdPresentation)
 }

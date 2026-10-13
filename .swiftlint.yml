@@ -12,6 +12,7 @@ function_body_length:
 identifier_name:
   excluded:
     - ad
+    - id
 
 large_tuple:
   warning: 3
@@ -26,4 +27,4 @@ type_body_length:
 included:
     - Sources
     - Tests
-    - Example
+    - Sandbox

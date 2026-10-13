@@ -6,7 +6,7 @@
 //
 
 /// Encodes the token used to record a viewed advertisement impression.
-struct ExchangeImpressionRequest: Encodable, Sendable {
+struct ExchangeImpressionRequest: Encodable {
     let impressionToken: String
 
     /// Maps the request properties to their Exchange API wire keys.

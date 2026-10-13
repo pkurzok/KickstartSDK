@@ -6,7 +6,7 @@
 //
 
 /// Encodes the application and environment details used to start a session.
-struct ExchangeSessionRequest: Encodable, Sendable {
+struct ExchangeSessionRequest: Encodable {
     let apiKey: String
     let bundleIdentifier: String
     let platform: String

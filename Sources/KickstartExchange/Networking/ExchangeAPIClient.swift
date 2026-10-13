@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import KickstartShared
 
 /// Performs session, advertisement, event, and report requests to the Exchange API.
-struct ExchangeAPIClient: Sendable {
+struct ExchangeAPIClient {
     /// The injectable transport operation used to execute an HTTP request.
     typealias Request = @Sendable (URLRequest) async throws -> (
         data: Data,
@@ -17,7 +18,6 @@ struct ExchangeAPIClient: Sendable {
     )
 
     static let previewAPIKey = "preview"
-    static let sdkVersion = "0.5.0"
 
     private static let sharedURLSession = URLSession(
         configuration: makeURLSessionConfiguration(),
@@ -284,7 +284,7 @@ struct ExchangeAPIClient: Sendable {
             platform: platform.rawValue,
             appVersion: appVersion,
             buildVersion: buildVersion,
-            sdkVersion: Self.sdkVersion,
+            sdkVersion: kickstartSDKVersion,
             development: development ? true : nil,
             appTransaction: evidence
         )
@@ -447,7 +447,7 @@ struct ExchangeAPIClient: Sendable {
 /// Prevents URLSession from following redirects automatically.
 final class ExchangeRedirectDelegate: NSObject,
     URLSessionTaskDelegate,
-    @unchecked Sendable {
+    Sendable {
     func urlSession(
         _ session: URLSession,
         task: URLSessionTask,

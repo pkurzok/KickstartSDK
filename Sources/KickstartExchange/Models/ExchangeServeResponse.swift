@@ -6,7 +6,7 @@
 //
 
 /// Contains an advertisement and the tokens needed for impression reporting.
-struct ExchangeServeResponse: Sendable {
+struct ExchangeServeResponse {
     let serveID: String?
     let impressionToken: String?
     let ad: ExchangeServedAdResponse

@@ -1,57 +1,6 @@
 {
   "version": 1,
   "scope": "exchange_and_sdk",
-  "routes": [
-    {
-      "method": "GET",
-      "path": "/exchange/v1/preview",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "GET",
-      "path": "/exchange/v1/preview/click",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "POST",
-      "path": "/exchange/v1/sessions",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "POST",
-      "path": "/exchange/v1/serve",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "POST",
-      "path": "/exchange/v1/impressions",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "POST",
-      "path": "/exchange/v1/reports",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    },
-    {
-      "method": "GET",
-      "path": "/exchange/v1/clicks/{click_token}",
-      "host": "api",
-      "resolve_session": false,
-      "same_origin": false
-    }
-  ],
   "operations": {
     "preview": {
       "path": "/exchange/v1/preview",
